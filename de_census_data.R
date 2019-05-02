@@ -1,20 +1,28 @@
 library(tidyverse)
-library(tidycensus)
-library(tigris)
 library(sf)
+library(tigris)
+library(tidycensus)
 library(data.table)
+
+### Get API Key from Census website
+# https://walkerke.github.io/tidycensus/articles/basic-usage.html
 
 variables <- c("B02001_002", "B02001_003", "B03003_003", "B02001_005", "B05002_013", "B19013_001", "B19001_017", "B25077_001", "B25064_001", "B15003_017", "B15003_022", "B15003_023")
 
-de_get_data <- function(c)
-              {get_acs(geography = "tract", 
-                    state = "DE",
-                    variables = c,
-                    geometry = TRUE,
-                    cb = TRUE)}
+# Code to API to get data
+# de_get_data <- function(c) {
+#   get_acs(geography = "tract",
+#     state = "DE",
+#     variables = c,
+#     geometry = TRUE,
+#     cb = TRUE)
+#   }
+ 
+#de_census_data <- lapply(variables, de_get_data)
+#save(de_census_data, file = "data/de_census_data.RData")
 
-de_census_data <- lapply(variables, de_get_data)
-
+# Load Data
+load("de_census_data.RData")
 de_clean_data1 <- function(a)
         {separate(a, col = NAME, into = c("Census_Tract", "County", "State"), sep = ",")}
 
