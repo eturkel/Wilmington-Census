@@ -22,7 +22,7 @@ variables <- c("B02001_002", "B02001_003", "B03003_003", "B02001_005", "B05002_0
 #save(de_census_data, file = "data/de_census_data.RData")
 
 # Load Data
-load("de_census_data.RData")
+load("data/de_census_data.RData")
 de_clean_data1 <- function(a)
         {separate(a, col = NAME, into = c("Census_Tract", "County", "State"), sep = ",")}
 
