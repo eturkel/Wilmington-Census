@@ -21,29 +21,16 @@ de_census_data <- get_acs(geography = "tract",
   variables = demo_variables,
   geometry = TRUE,
 
-# Split 'NAME' into three separate variables. Currently, data on census tract, county, and state are all contained in same variable.
-# Splitting 'NAME' into 'Census_Tract', 'County', & 'State' provides more opportunities to subset and join data with other datasets.
-de_clean_data1 <- function(a, b)
- {separate(a, col = NAME, into = c("Census_Tract", "County", "State"), sep = ",")}
-
-de_clean_data1 <- function(a)
-        {separate(a, col = NAME, into = c("Census_Tract", "County", "State"), sep = ",")}
-
-de_census_data2 <- lapply(de_census_data, de_clean_data1)
-
-# After creating a variable for 'Census_Tract', it is neccessary to conduct another split b/c
-# We want to isolate the number of the census tract. We don't want each observation to read 'Census Tract x'
-
-de_clean_data2 <- function(b)
-        {separate(b, col = Census_Tract, into = c("Census", "Tract", "Number"), sep = " ")}
-
-de_census_data3 <- lapply(de_census_data2, de_clean_data2)
-
-# Next we rename the variable so that it has a clearer meaning
-de_clean_data3 <- function(c)
-{setnames(c, old=c( "Number"), new=c("Census_Tract_Number"))}
-
-de_census_data4 <- lapply(de_census_data3, de_clean_data3)
+## Cleaning Steps
+# 1. Split 'NAME' into three separate variables. Currently, data on census tract, county, and state are all contained in same variable.
+#    Splitting 'NAME' into 'Census_Tract', 'County', & 'State' provides more opportunities to subset and join data with other datasets.
+# 2. After creating a variable for 'Census_Tract', it is neccessary to conduct another split b/c
+#    We want to isolate the number of the census tract. We don't want each observation to read 'Census Tract x'
+# 3. Next we rename the variable so that it has a clearer meaning
+de_census_data_clean <- de_census_data %>%
+    separate(col = NAME, into = c("Census_Tract", "County", "State"), sep = ",") %>%
+    separate(col = Census_Tract, into = c("Census", "Tract", "Number"), sep = " ") %>%
+    setnames(old=c( "Number"), new=c("Census_Tract_Number"))
 
 # Ultimately, we want to create a dataset that combines a bunch of census tract variables.
 # In order to do this we need to rename variables across data sets to reflect that each is unique, otherwise R won't allow us to join them together.
