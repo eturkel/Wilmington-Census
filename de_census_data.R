@@ -36,14 +36,9 @@ de_census_data_clean <- de_census_data %>%
 write.csv(de_census_data_clean, file = "de_census_data_export.csv")
 
 # Subset dataframe to only include Wilmington tracts
-AllTracts <- as.numeric(as.character(de_census_data_export$Census_Tract_Number))
-AllTracts <- data.frame(AllTracts)
-Wilm_census_data <- cbind(de_census_data_export, AllTracts)
-Wilm_census_data <- Wilm_census_data %>%
-  filter(AllTracts %in% c(2, 3, 4, 5, 6.01, 6.02, 9, 11, 12, 13, 14, 15, 16, 19.02, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30.02))
+Wilm_census_data <- de_census_data_clean %>%  
+  filter(Census_Tract_Number %in% c(2, 3, 4, 5, 6.01, 6.02, 9, 11, 12, 13, 14, 15, 16, 19.02, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30.02))
 
-# "B02001_002", "B02001_003", "B03003_003", "B02001_005", "B05002_013", "B19013_001"
-# "B19001_017", "B25077_001", "B25064_001", "B15003_017", "B15003_022", "B15003_023"
 
 # Plot all our data
 ggplot(Wilm_census_data, aes(fill = B02001_002_estimate, color = B02001_002_estimate)) +
