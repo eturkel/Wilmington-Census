@@ -6,23 +6,20 @@ library(data.table)
 
 ### Get API Key from Census website
 # https://walkerke.github.io/tidycensus/articles/basic-usage.html
+demo_variables <- c(white = "B02001_002", black = "B02001_003", hispanic = "B03003_003",
+               asian = "B02001_005", foreignborn = "B05002_013", median_income = "B19013_001",
+               households_earning_over_200k = "B19001_017", median_house_value = "B25077_001",
+               median_monthly_rent = "B25064_001", high_school_diplomas = "B15003_017",
+               bachelor_degrees = "B15003_022", masters_degrees = "B15003_023")
+
 
 variables <- c("B02001_002", "B02001_003", "B03003_003", "B02001_005", "B05002_013", "B19013_001", "B19001_017", "B25077_001", "B25064_001", "B15003_017", "B15003_022", "B15003_023")
 
 # Code to API to get data
-# de_get_data <- function(c) {
-#   get_acs(geography = "tract",
-#     state = "DE",
-#     variables = c,
-#     geometry = TRUE,
-#     cb = TRUE)
-#   }
-
-#de_census_data <- lapply(variables, de_get_data)
-#save(de_census_data, file = "data/de_census_data.RData")
-
-# Load Data
-load("data/de_census_data.RData")
+de_census_data <- get_acs(geography = "tract",
+  state = "DE",
+  variables = demo_variables,
+  geometry = TRUE,
 
 # Split 'NAME' into three separate variables. Currently, data on census tract, county, and state are all contained in same variable.
 # Splitting 'NAME' into 'Census_Tract', 'County', & 'State' provides more opportunities to subset and join data with other datasets.
