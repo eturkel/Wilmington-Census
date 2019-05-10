@@ -33,70 +33,7 @@ de_census_data_clean <- de_census_data %>%
     setnames(old=c( "Number"), new=c("Census_Tract_Number"))
 
 # Ultimately, we want to create a dataset that combines a bunch of census tract variables.
-# In order to do this we need to rename variables across data sets to reflect that each is unique, otherwise R won't allow us to join them together.
-# Since we need to rename variables in data sets so that they are unique, it is neccessary to transform the data set from a list to a data frame.
-# The following statements transform individual elements in our list to a data frame.
-
-de_white <- as.data.frame(de_census_data3[[1]])
-de_black <- as.data.frame(de_census_data3[[2]])
-de_hispanic <- as.data.frame(de_census_data3[[3]])
-de_asian <- as.data.frame(de_census_data3[[4]])
-de_foreignborn <- as.data.frame(de_census_data3[[5]])
-de_median_income <- as.data.frame(de_census_data3[[6]])
-de_households_earning_over_200k <- as.data.frame(de_census_data3[[7]])
-de_median_house_value <- as.data.frame(de_census_data3[[8]])
-de_median_monthly_rent <- as.data.frame(de_census_data3[[9]])
-de_high_school_diplomas <- as.data.frame(de_census_data3[[10]])
-de_bachleor_degrees <- as.data.frame(de_census_data3[[11]])
-de_masters_degrees <- as.data.frame(de_census_data3[[12]])
-
-# Rename unique variables in each data set
-setnames(de_white, old=c("estimate", "moe"), new=c("B02001_002_estimate", "B02001_002_moe"))
-setnames(de_black, old=c("estimate", "moe"), new=c("B02001_003_estimate", "B02001_003_moe"))
-setnames(de_hispanic, old=c("estimate", "moe"), new=c("B03003_003_estimate", "B03003_003_moe"))
-setnames(de_asian, old=c("estimate", "moe"), new=c("B02001_005_estimate", "B02001_005_moe"))
-setnames(de_foreignborn, old=c("estimate", "moe"), new=c("B05002_013_estimate", "B05002_013_moe"))
-setnames(de_median_income, old=c("estimate", "moe"), new=c("B19013_001_estimate", "B19013_001_moe"))
-setnames(de_households_earning_over_200k, old=c("estimate", "moe"), new=c("B19001_017_estimate", "B19001_017_moe"))
-setnames(de_median_house_value, old=c("estimate", "moe"), new=c("B25077_001_estimate", "B25077_001_moe"))
-setnames(de_median_monthly_rent, old=c("estimate", "moe"), new=c("B25064_001_estimate", "B25064_001_moe"))
-setnames(de_high_school_diplomas, old=c("estimate", "moe"), new=c("B15003_017_estimate", "B15003_017_moe"))
-setnames(de_bachleor_degrees, old=c("estimate", "moe"), new=c("B15003_022_estimate", "B15003_022_moe"))
-setnames(de_masters_degrees, old=c("estimate", "moe"), new=c("B15003_023_estimate", "B15003_023_moe"))
-
-# The next step to join our data sets together is to create a data frame that contains the variables common to all data sets.
-de_census_geo <- select(de_white, GEOID, Census_Tract_Number, County, geometry)
-
-# Then, we create data frames that contain only the variables unique to each data frame, plus GEOID - which we will join by.
-# If we didn't do this, then our final dataset would contain a bunch of duplicates and be difficult to read.
-de_white_join <- select(de_white, GEOID, B02001_002_estimate, B02001_002_moe)
-de_black_join <- select(de_black, GEOID, B02001_003_estimate, B02001_003_moe)
-de_hispanic_join <- select(de_hispanic, GEOID, B03003_003_estimate, B03003_003_moe)
-de_asian_join <- select(de_asian, GEOID, B02001_005_estimate, B02001_005_moe)
-de_foreignborn_join <- select(de_foreignborn, GEOID, B05002_013_estimate, B05002_013_moe)
-de_median_income_join <- select(de_median_income, GEOID, B19013_001_estimate, B19013_001_moe)
-de_households_earning_over_200k_join <- select(de_households_earning_over_200k, GEOID, B19001_017_estimate, B19001_017_moe)
-de_median_house_value_join <- select(de_median_house_value, GEOID, B25077_001_estimate, B25077_001_moe)
-de_median_monthly_rent_join <- select(de_median_monthly_rent, GEOID, B25064_001_estimate, B25064_001_moe)
-de_high_school_diploma_join <- select(de_high_school_diplomas, GEOID, B15003_017_estimate, B15003_017_moe)
-de_bachleor_degrees_join <- select(de_bachleor_degrees, GEOID, B15003_022_estimate, B15003_022_moe)
-de_masters_degree_join <- select(de_masters_degrees, GEOID, B15003_023_estimate, B15003_023_moe)
-
-# Next, we join the variables unique to each data set to our newly created data frame which contains common variables.
-de_census_data_export <- left_join(de_census_geo, de_white_join, by = c("GEOID" = "GEOID")) %>%
-                            left_join(., de_black_join, by="GEOID") %>%
-                            left_join(., de_hispanic_join, by="GEOID") %>%
-                            left_join(., de_asian_join, by="GEOID") %>%
-                            left_join(., de_foreignborn_join, by="GEOID") %>%
-                            left_join(., de_median_income_join, by="GEOID") %>%
-                            left_join(., de_households_earning_over_200k_join, by="GEOID") %>%
-                            left_join(., de_median_house_value_join, by="GEOID") %>%
-                            left_join(., de_median_monthly_rent_join, by="GEOID") %>%
-                            left_join(., de_high_school_diploma_join, by="GEOID") %>%
-                            left_join(., de_bachleor_degrees_join, by="GEOID") %>%
-                            left_join(., de_masters_degree_join, by="GEOID")
-
-write.csv(de_census_data_export, file = "de_census_data_export.csv")
+write.csv(de_census_data_clean, file = "de_census_data_export.csv")
 
 # Subset dataframe to only include Wilmington tracts
 AllTracts <- as.numeric(as.character(de_census_data_export$Census_Tract_Number))
