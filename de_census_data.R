@@ -20,6 +20,7 @@ de_census_data <- get_acs(geography = "tract",
   state = "DE",
   variables = demo_variables,
   geometry = TRUE,
+  cb = TRUE)
 
 ## Cleaning Steps
 # 1. Split 'NAME' into three separate variables. Currently, data on census tract, county, and state are all contained in same variable.
@@ -36,163 +37,75 @@ de_census_data_clean <- de_census_data %>%
 write.csv(de_census_data_clean, file = "de_census_data_export.csv")
 
 # Subset dataframe to only include Wilmington tracts
-Wilm_census_data <- de_census_data_clean %>%  
+Wilm_census_data <- de_census_data_clean %>%
   filter(Census_Tract_Number %in% c(2, 3, 4, 5, 6.01, 6.02, 9, 11, 12, 13, 14, 15, 16, 19.02, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30.02))
 
-
 # Plot all our data
-ggplot(Wilm_census_data, aes(fill = B02001_002_estimate, color = B02001_002_estimate)) +
+ggplot(Wilm_census_data, aes(fill = estimate)) +
   geom_sf() +
   scale_fill_viridis_c() +
   scale_color_viridis_c(guide = FALSE) +
   theme_minimal() +
   coord_sf(crs = 26916, datum = NA) +
-  labs(title = "White Population by Census Tract",
+  labs(title = "Estimates by Census Tract",
        subtitle = "Wilmington, DE",
        caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
+       fill = "ACS estimate") +
+  facet_wrap(~variable)
+# one issue here is most plots are black since the scales are fixed
+# so we could view race separate from education/income
 
-ggsave("wilm_white_pop.jpeg")
+# Plot only race/ethnicity
+## filter the ones we want to see
+Wilm_census_race <- Wilm_census_data %>%
+  filter(variable %in% c("hispanic", "black", "asian", "white", "foreignborn"))
 
-ggplot(Wilm_census_data, aes(fill = B02001_003_estimate, color = B02001_003_estimate)) +
+ggplot(Wilm_census_race, aes(fill = estimate)) +
   geom_sf() +
   scale_fill_viridis_c() +
   scale_color_viridis_c(guide = FALSE) +
   theme_minimal() +
   coord_sf(crs = 26916, datum = NA) +
-  labs(title = "African-American Population by Census Tract",
+  labs(title = "Population Estimates by Census Tract",
        subtitle = "Wilmington, DE",
        caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
+       fill = "ACS estimate") +
+  facet_wrap(~variable)
 
-ggsave("wilm_african_american_pop.jpeg")
 
-ggplot(Wilm_census_data, aes(fill = B03003_003_estimate, color = B03003_003_estimate)) +
+# Plot the education variables
+Wilm_census_ed <- Wilm_census_data %>%
+  filter(variable %in% c("high_school_diplomas", "bachelor_degrees", "masters_degrees"))
+
+ggplot(Wilm_census_ed, aes(fill = estimate)) +
   geom_sf() +
   scale_fill_viridis_c() +
   scale_color_viridis_c(guide = FALSE) +
   theme_minimal() +
   coord_sf(crs = 26916, datum = NA) +
-  labs(title = "Hispanic Population by Census Tract",
+  labs(title = "Education Estimates by Census Tract",
        subtitle = "Wilmington, DE",
        caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
+       fill = "ACS estimate") +
+  facet_wrap(~variable)
 
-ggsave("wilm_hispanic_pop.jpeg")
+# Plot the income variables
+Wilm_census_incexp <- Wilm_census_data %>%
+  filter(variable %in% c("households_earning_over_200k", "median_income", "median_monthly_rent", "median_house_value"))
 
-ggplot(Wilm_census_data, aes(fill = B02001_005_estimate, color = B02001_005_estimate)) +
+ggplot(Wilm_census_incexp, aes(fill = estimate)) +
   geom_sf() +
   scale_fill_viridis_c() +
   scale_color_viridis_c(guide = FALSE) +
   theme_minimal() +
   coord_sf(crs = 26916, datum = NA) +
-  labs(title = "Asian Population by Census Tract",
+  labs(title = "Income, Rent Estimates by Census Tract",
        subtitle = "Wilmington, DE",
        caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
+       fill = "ACS estimate") +
+  facet_wrap(~variable)
+ggsave("income-exp.jpeg")
 
-ggsave("wilm_asian_pop.jpeg")
-
-ggplot(Wilm_census_data, aes(fill = B05002_013_estimate, color = B05002_013_estimate)) +
-  geom_sf() +
-  scale_fill_viridis_c() +
-  scale_color_viridis_c(guide = FALSE) +
-  theme_minimal() +
-  coord_sf(crs = 26916, datum = NA) +
-  labs(title = "Foreign Born Population by Census Tract",
-       subtitle = "Wilmington, DE",
-       caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
-
-ggsave("wilm_foreign_born.jpeg")
-
-ggplot(Wilm_census_data, aes(fill = B19013_001_estimate, color = B19013_001_estimate)) +
-  geom_sf() +
-  scale_fill_viridis_c(labels = scales::dollar) +
-  scale_color_viridis_c(guide = FALSE) +
-  theme_minimal() +
-  coord_sf(crs = 26916, datum = NA) +
-  labs(title = "Median Income by Census Tract",
-       subtitle = "Wilmington, DE",
-       caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
-
-ggsave("wilm_median_income.jpeg")
-
-ggplot(Wilm_census_data, aes(fill = B19001_017_estimate, color = B19001_017_estimate)) +
-  geom_sf() +
-  scale_fill_viridis_c() +
-  scale_color_viridis_c(guide = FALSE) +
-  theme_minimal() +
-  coord_sf(crs = 26916, datum = NA) +
-  labs(title = "Number of Households Earning over 200K by Census Tract",
-       subtitle = "Wilmington, DE",
-       caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
-
-ggsave("wilm_over200k.jpeg")
-
-ggplot(Wilm_census_data, aes(fill = B25077_001_estimate, color = B25077_001_estimate)) +
-  geom_sf() +
-  scale_fill_viridis_c(labels = scales::dollar) +
-  scale_color_viridis_c(guide = FALSE) +
-  theme_minimal() +
-  coord_sf(crs = 26916, datum = NA) +
-  labs(title = "Median Housing Value by Census Tract",
-       subtitle = "Wilmington, DE",
-       caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
-
-ggsave("wilm_median_housing_value.jpeg")
-
-ggplot(Wilm_census_data, aes(fill = B25064_001_estimate, color = B25064_001_estimate)) +
-  geom_sf() +
-  scale_fill_viridis_c(labels = scales::dollar) +
-  scale_color_viridis_c(guide = FALSE) +
-  theme_minimal() +
-  coord_sf(crs = 26916, datum = NA) +
-  labs(title = "Median Monthly Rent by Census Tract",
-       subtitle = "Wilmington, DE",
-       caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
-
-ggsave("wilm_median_monthly_rent.jpeg")
-
-ggplot(Wilm_census_data, aes(fill = B15003_017_estimate, color = B15003_017_estimate)) +
-  geom_sf() +
-  scale_fill_viridis_c() +
-  scale_color_viridis_c(guide = FALSE) +
-  theme_minimal() +
-  coord_sf(crs = 26916, datum = NA) +
-  labs(title = "Number of High School Diplomas by Census Tract",
-       subtitle = "Wilmington, DE",
-       caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
-
-ggsave("wilm_highschool_dipolmas.jpeg")
-
-ggplot(Wilm_census_data, aes(fill = B15003_022_estimate, color = B15003_022_estimate)) +
-  geom_sf() +
-  scale_fill_viridis_c() +
-  scale_color_viridis_c(guide = FALSE) +
-  theme_minimal() +
-  coord_sf(crs = 26916, datum = NA) +
-  labs(title = "Number of Bachelors Degrees by Census Tract",
-       subtitle = "Wilmington, DE",
-       caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
-
-ggsave("wilm_bachelor_degrees.jpeg")
-
-ggplot(Wilm_census_data, aes(fill = B15003_023_estimate, color = B15003_023_estimate)) +
-  geom_sf() +
-  scale_fill_viridis_c() +
-  scale_color_viridis_c(guide = FALSE) +
-  theme_minimal() +
-  coord_sf(crs = 26916, datum = NA) +
-  labs(title = "Number of Masters Degrees by Census Tract",
-       subtitle = "Wilmington, DE",
-       caption = "Data source: 2016 ACS.\nData acquired with the R tidycensus package.",
-       fill = "ACS estimate")
-
-ggsave("wilm_masters_degrees.jpeg")
+## Food for thought
+#What are the variables we'd most want to compare?Do we want to show margin of error? ratios of education to income?
+#Could change the estimates to comparison between counties - normalize by subtracting average value
