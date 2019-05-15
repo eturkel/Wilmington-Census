@@ -8,6 +8,11 @@ output: ioslides_presentation
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+## Agenda
+
+- topic 1
+- topic 2
+- topic 3
 
 # History of the US Census
 
