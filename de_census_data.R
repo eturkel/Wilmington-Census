@@ -10,12 +10,16 @@ demo_variables <- c(white = "B02001_002", black = "B02001_003", hispanic = "B030
                asian = "B02001_005", foreignborn = "B05002_013", median_income = "B19013_001",
                households_earning_over_200k = "B19001_017", median_house_value = "B25077_001",
                median_monthly_rent = "B25064_001", high_school_diplomas = "B15003_017",
-               bachelor_degrees = "B15003_022", masters_degrees = "B15003_023")
+               bachelor_degrees = "B15003_022", masters_degrees = "B15003_023", Less_than_10k =
+               "B19001_002", households_earning_10k_14999k = "B19001_003", households_earning_15k_19999k = "B19001_004", households_earning_20k_24999k =
+               "B19001_005", households_earning_25k_29999k = "B19001_006", Owner_occupied = "B25003_002", Renter_occupied = "B25003_003", 
+               Occupied = "B25002_002", Vacant = "B25002_003")
 
-
-variables <- c("B02001_002", "B02001_003", "B03003_003", "B02001_005", "B05002_013", "B19013_001", "B19001_017", "B25077_001", "B25064_001", "B15003_017", "B15003_022", "B15003_023")
 
 # Code to API to get data
+# One thing to make sure we know is what year we are analayzing. I believe that 2017 so that is the year we are analyzing.
+# Future iterations could build on this by adding decennial census data. TidyCensus has the 1990, 2000, and 2010 surveys.
+# Another aspect future iterations could also add data from other sources, such as crime statistics from the Uniform Crime Reporting database maintained by the FBI.
 de_census_data <- get_acs(geography = "tract",
   state = "DE",
   variables = demo_variables,
@@ -34,6 +38,7 @@ de_census_data_clean <- de_census_data %>%
     setnames(old=c( "Number"), new=c("Census_Tract_Number"))
 
 # Ultimately, we want to create a dataset that combines a bunch of census tract variables.
+# Another question I have is about tidy format. Is the data set we are creating in tidy format?
 write.csv(de_census_data_clean, file = "de_census_data_export.csv")
 
 # Subset dataframe to only include Wilmington tracts
