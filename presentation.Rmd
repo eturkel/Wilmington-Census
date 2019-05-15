@@ -1,0 +1,85 @@
+---
+title: "Visualizing United States Census Data"
+author: "Eli Turkel <br/> Nadia Antony"
+date: "5/21/2019"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# History of the US Census
+
+## US Census Timeline
+
+- bullet 1
+- bullet 2
+
+## Data Visualization in the 1800s
+
+```{r, echo=FALSE}
+knitr::include_graphics("images/statab1890.jpg")
+```
+
+## The Statistical Atlas
+
+In fact, up until recently, the Statistical Atlas had been published and released for each Census since 1870! A large compilation of data visualizaitons based on census data:
+
+[1920 Statistical Atlas](https://fraser.stlouisfed.org/files/docs/publications/stat1925/statatlas1925.pdf)
+
+```{r, echo=FALSE, out.width="30%"}
+knitr::include_graphics("images/atlas.png")
+```
+
+## Delaware Population (1920)
+
+```{r, echo=FALSE, out.width="50%", fig.align='center'}
+knitr::include_graphics("images/delaware1920.png")
+```
+
+## USA Population Density (1920)
+
+```{r, echo=FALSE, out.width="65%", fig.align='center'}
+knitr::include_graphics("images/popdens.png")
+```
+
+## Migration by State (1920)
+
+```{r, echo=FALSE, out.width="60%", fig.align='center'}
+knitr::include_graphics("images/migrationbystate.png")
+```
+
+# Nearly 100 years later, computers make this task MUCH easier...
+
+## Tidycensus Overview
+
+## Variable Search
+
+## Load Var Function
+
+- getting api key
+
+## What is Tidy Data
+
+## Steps Through The Analysis
+
+Load Libraries
+
+```{r, eval=FALSE}
+library(tidyverse)
+library(sf)
+library(tigris)
+library(tidycensus)
+
+```
+
+## Looking back: Why was Tidy data useful
+
+* facet
+* group_by
+
+## Recreating Maps/Other Analysis
+
+
+## Next steps
