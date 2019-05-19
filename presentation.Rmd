@@ -15,11 +15,10 @@ knitr::opts_chunk$set(eval = FALSE)
 - topic 3
 
 # History of the US Census
+- Getting started with Tidycensus
 
 ## US Census Timeline
 
-- bullet 1
-- bullet 2
 
 ## Data Visualization in the 1800s
 

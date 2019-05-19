@@ -15,9 +15,8 @@ demo_variables <- c(white = "B02001_002", black = "B02001_003", hispanic = "B030
                "B19001_005", households_earning_25k_29999k = "B19001_006", Owner_occupied = "B25003_002", Renter_occupied = "B25003_003", 
                Occupied = "B25002_002", Vacant = "B25002_003")
 
-
 # Code to API to get data
-# One thing to make sure we know is what year we are analayzing. I believe that 2017 so that is the year we are analyzing.
+# One thing to make sure we know is what year we are analayzing. I believe that 2016 so that is the year we are analyzing.
 # Future iterations could build on this by adding decennial census data. TidyCensus has the 1990, 2000, and 2010 surveys.
 # Another aspect future iterations could also add data from other sources, such as crime statistics from the Uniform Crime Reporting database maintained by the FBI.
 de_census_data <- get_acs(geography = "tract",
