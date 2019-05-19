@@ -6,63 +6,66 @@ output: ioslides_presentation
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(eval = T)
 ```
 ## Agenda
 
-- topic 1
-- topic 2
-- topic 3
-
-# History of the US Census
+- History of the U.S. Census
 - Getting started with Tidycensus
+- Analysis with examples from Delaware
 
 ## US Census Timeline
 
+- 1790: 6 question survey / U.S. pop just under 4 million
+- 1810: Census adds data collection on U.S. manufacturers
+- 1849: Congress establishes Census Board
+- 1890: Herman Hollerith's tabulation machine used in data collection
+- 1900: Census becomes a permant agency and inter-decennial data collection begins
+- 1920: For first time, majority of U.S. pop lives in urban areas / U.S. pop over 106 million
+- 1940: First use of statistical sampling
+- 1960: DIME (Dual Independent Map Encoding)
 
-## Data Visualization in the 1800s
+##
 
-```{r, echo=FALSE, out.width="45%"}
-knitr::include_graphics("images/statab1890.jpg")
-```
-
-## The Statistical Atlas
-
-In fact, up until recently, the Statistical Atlas had been published and released for each Census since 1870! A large compilation of data visualizaitons based on census data:
-
-[1920 Statistical Atlas](https://fraser.stlouisfed.org/files/docs/publications/stat1925/statatlas1925.pdf)
-
-```{r, echo=FALSE, out.width="30%"}
-knitr::include_graphics("images/atlas.png")
-```
-
-## Delaware Population (1920)
-
-```{r, echo=FALSE, out.width="50%", fig.align='center'}
-knitr::include_graphics("images/delaware1920.png")
-```
-
-## USA Population Density (1920)
-
-```{r, echo=FALSE, out.width="65%", fig.align='center'}
-knitr::include_graphics("images/popdens.png")
-```
-
-## Migration by State (1920)
-
-```{r, echo=FALSE, out.width="60%", fig.align='center'}
-knitr::include_graphics("images/migrationbystate.png")
-```
-
-# Nearly 100 years later, computers make this task MUCH easier...
+- 1970: All data products available on magnetic computer tape
+- 1980: Mailout / Mailin Surveys
+- 2000: U.S. Census asks ten questions
+- 2010: American Community Survey 5-year estimates released
 
 ## Tidycensus Overview
 
+- Developed by Kyle Walker
+- [Check out the package on Github!](https://github.com/walkerke/tidycensus)
+- Tidycensus is an API wrapper that allows R users to ingest decennial surveys and the American Community Survey (ACS) estimates
+- Census data back to the 1990 decennial survey is available
+- The defaul in the 5-year ACS estimate from 2013-2017
+
+## Getting an API key
+
+- [https://api.census.gov/data/key_signup.html](https://api.census.gov/data/key_signup.html)
+- You'll then recieve an e-mail from the census with your API key
+
+```{r, eval=FALSE}
+api_key <- "xxxxxxxx"
+census_api_key(api_key, install = TRUE)
+Sys.getenv("CENSUS_API_KEY")
+```
+
 ## Variable Search
+
+```{r}
+library(tidycensus)
+v17 <- load_variables(2017, "acs5", cache = TRUE)
+v17
+```
 
 ## Load Var Function
 
-- getting api key
+```{r, eval=FALSE}
+vt <- get_acs(geography = "county", 
+              variables = c(medincome = "B19013_001"), 
+              state = "VT")
+```
 
 ## What is Tidy Data
 
