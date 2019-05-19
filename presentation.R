@@ -3,9 +3,14 @@ v1 <- c(1, 2, 3, 4)
 v2 <- c(5, 6, 7, 8)
 v2-v1
 
-# install.packages("sf")
-# install.packages("tidycensus")
-#
+# install.packages
+install.packages("sf")
+install.packages("tidycensus")
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("tidyr")
+install.packages("purrr")
+install.packages("lwgeom")
 
 
 ## ---- include=FALSE, results='hide'--------------------------------------
@@ -19,13 +24,13 @@ library(purrr)
 
 
 ## ----API-------------------------------------------------------
-# census_api_key("<YOUR API KEY>")
-# demo_variables <- # define the variables you want to analyze here
-# de_census_data <- get_acs(geography = "tract",
-#                           state = "DE",
-#                           variables = demo_variables,
-#                           geometry = TRUE,
-#                           cb = TRUE)
+census_api_key("<YOUR API KEY>")
+demo_variables <- # define the variables you want to analyze here
+de_census_data <- get_acs(geography = "tract",
+                          state = "DE",
+                          variables = demo_variables,
+                          geometry = TRUE,
+                          cb = TRUE)
 
 
 ## ------------------------------------------------------------------------
