@@ -128,6 +128,7 @@ install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("tidyr")
 install.packages("purrr")
+install.packages("lwgeom")
 ```
 
 ## Load Libraries
@@ -141,10 +142,19 @@ library(tidycensus)
 library(tigris)
 library(purrr)
 ```
+```{r, eval=FALSE}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(sf)
+library(tidycensus)
+library(tigris)
+library(purrr)
+```
 
 ## Your Choices!
 
-1) Get an API Key from http://api.census.gov/data/key_signup.html
+Get an API Key from http://api.census.gov/data/key_signup.html
 
 ```{r, eval = FALSE}
 census_api_key("<YOUR API KEY>")
@@ -158,7 +168,7 @@ de_census_data <- get_acs(geography = "tract",
 
 OR
 
-2) Load de_census_data.RData
+Load de_census_data.RData
 
 ```{r}
 load("data/de_census_data.RData")
@@ -320,14 +330,16 @@ ggplot(wilm_census_race, aes(fill = estimate)) +
 ```{r race, echo=FALSE}
 ```
 
-## Comparing the Right Way
+## Comparing a Better Way
 
 'Small multiples plots' are useful to compare between variables.
 But we need to make sure we compare the right proportions so as to not let people take away a wrong insight.
 
-Let's do some data aggregation and data joins.
+Let's do some data aggregation and data joins to find the percentages within each tract.
 
-Highlight and run to see the separate steps.
+## 
+
+Highlight sections and run using `cmd`+ `return` to see the separate steps.
 
 ```{r}
 # get the total population by summing up the different race estimates
@@ -441,8 +453,8 @@ wilm_census_data %>%
         mutate(group = group)
 ```
 
-st_sample() generates a sample of random dots each one representing 10 people. 
-st_sf() converts the POINT geometry set back to simple features dataframe.
+- st_sample() generates a sample of random dots each one representing 10 people. 
+- st_sf() converts the POINT geometry set back to simple features dataframe.
 
 ## Plotting it all together
 
