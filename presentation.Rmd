@@ -6,7 +6,7 @@ output: ioslides_presentation
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(eval = FALSE)
 ```
 ## Agenda
 
@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Data Visualization in the 1800s
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, out.width="45%"}
 knitr::include_graphics("images/statab1890.jpg")
 ```
 
@@ -67,24 +67,410 @@ knitr::include_graphics("images/migrationbystate.png")
 
 ## What is Tidy Data
 
-## Steps Through The Analysis
+All of the tidyverse packages operate easily when you have data in this structure!
 
-Load Libraries
+Three interrelated rules:
+
+1. Each variable must have its own column.
+2. Each observation must have its own row.
+3. Each value must have its own cell.
+
+```{r, echo=FALSE, out.width="60%", fig.align='center'}
+knitr::include_graphics("images/tidy.png")
+```
+
+  *https://r4ds.had.co.nz/tidy-data.html#fig:tidy-structure* 
+
+## Why should I care?
+
+R is a vectorized language, meaning you can do operations like:
+
+```{r}
+v1 <- c(1, 2, 3, 4)
+v2 <- c(5, 6, 7, 8)
+v2-v1
+```
+instead of writing a for loop to subtract the individual elements
+
+The packages inside the tidyverse, e.g `dplyr`, let you do data cleaning and manipulation operations easily when data is in tidy format.
+
+Using these packages can help - write faster and more 'readable' code
+
+## Brief Concepts - Some commands you'll see
+
+- `%>%` “pipe” operator for chaining
+- `filter` to subset a dataframe
+- `group_by` and then `summarise`
+- `facet` to create small multiples plots
+- `left_join` to join datasets
+
+# Let's Start the Analysis!
+
+## Setup 
+
+- Install [R](https://www.r-project.org) and [RStudio](https://www.rstudio.com/products/rstudio/download/)
+- Download the [Repository](https://github.com/eturkel/Wilmington-Census)
+
+```{r, echo=FALSE, out.width="30%"}
+knitr::include_graphics("images/repo-download.png")
+```
+
+ **OR**
+
+* Use this RStudio Cloud workspace: https://rstudio.cloud/project/352564
+
+## Install Packages (If Local Setup)
 
 ```{r, eval=FALSE}
-library(tidyverse)
-library(sf)
-library(tigris)
-library(tidycensus)
+install.packages("sf")
+install.packages("tidycensus")
 
 ```
 
-## Looking back: Why was Tidy data useful
+## Load Libraries
+
+```{r, include=FALSE, results='hide'}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(sf)
+library(tidycensus)
+library(tigris)
+library(purrr)
+```
+
+## Your Choices!
+
+1) Get an API Key from http://api.census.gov/data/key_signup.html
+
+```{r, eval = FALSE}
+census_api_key("<YOUR API KEY>")
+demo_variables <- # define the variables you want to analyze here
+de_census_data <- get_acs(geography = "tract",
+                          state = "DE",
+                          variables = demo_variables,
+                          geometry = TRUE,
+                          cb = TRUE)
+```
+
+OR
+
+2) Load de_census_data.RData
+
+```{r}
+load("data/de_census_data.RData")
+```
+
+## Look at the data
+
+```{r}
+de_census_data
+```
+
+## Onto Plotting!
+
+We use the ggplot2 package for **layering** plot info. 
+`geom_sf` is used to map the varied shapes (polygons, lines) 
+
+```{r}
+ggplot(de_census_data, aes(fill = estimate))
+```
+
+##
+
+```{r}
+ggplot(de_census_data, aes(fill = estimate)) +
+  geom_sf() 
+```
+
+##
+
+```{r}
+ggplot(de_census_data, aes(fill = estimate)) +
+  geom_sf() +
+  scale_fill_viridis_c() +
+  theme_minimal() 
+```
+
+## 
+
+```{r}
+ggplot(de_census_data, aes(fill = estimate)) +
+  geom_sf() +
+  scale_fill_viridis_c() +
+  theme_minimal() +
+  labs(title = "Estimates by Census Tract")
+```
+
+## Some Cleaning using `%>%`
+
+```{r}
+de_census_data_clean <- de_census_data %>%
+    separate(col = NAME, into = c("Census_Tract", "County", "State"), 
+             sep = ",") %>%
+    separate(col = Census_Tract, into = c("Census", "Tract", "Census_Tract_Number"),
+             sep = " ") 
+
+# Let's look at the above code step by step using the 'grammar'
+de_census_data %>% # take the data, and then
+    separate(col = NAME, into = c("Census_Tract", "County", "State"), 
+             sep = ",")
+```
+
+##
+
+```{r}
+de_census_data %>% # take the data, and then
+    separate(col = NAME, into = c("Census_Tract", "County", "State"), 
+             sep = ",") %>% # separate, and then
+    separate(col = Census_Tract, into = c(NA, NA, "Census_Tract_Number"),
+             sep = " ") # separate out Number and then
+# this result is assigned to de_census_data_clean using the assignment operator '<-'
+```
+
+## Pick one Variable to view Estimates
+
+```{r}
+# Let's look at the number of foreignborn in each Tract
+de_census_fb <- de_census_data_clean %>%
+  filter(variable %in% c("foreignborn"))
+```
+```{r fb, eval=FALSE}
+ggplot(de_census_fb, aes(fill = estimate)) +
+  geom_sf() +
+  scale_fill_viridis_c() +
+  coord_sf(crs = 26916, datum = NA) +
+  labs(title = "Foreign-Born Estimates by DE Census Tract",
+       caption = "Data: 2013-2017 5-year ACS",
+       fill = "ACS estimate")
+```
+
+##
+
+```{r fb}
+```
+
+## Subset only Wilmington using Tract
+
+```{r}
+# Wilmington Tracts 
+wilm_census_data <- de_census_data_clean %>%
+  filter(Census_Tract_Number %in% c(2, 3, 4, 5, 6.01, 6.02, 9, 11, 12,
+                                    13, 14, 15, 16, 19.02, 21, 22, 23, 
+                                    24, 25, 26, 27, 28, 29, 30.02))
+
+```
+
+## Let's Plot EVERYTHING!
+
+```{r, eval=FALSE}
+# Plot all our data
+ggplot(wilm_census_data, aes(fill = estimate)) +
+  geom_sf() +
+  scale_fill_viridis_c() +
+  coord_sf(crs = 26916, datum = NA) +
+  labs(title = "Estimates by Census Tract",
+       subtitle = "Wilmington, DE",
+       caption = "Data: 2013-2017 5-year ACS
+       \nData acquired with the R tidycensus package.",
+       fill = "ACS estimate") +
+  facet_wrap(~variable)
+```
+
+## What's the problem?
+
+```{r, echo=FALSE, fig.width=8}
+# Plot all our data
+ggplot(wilm_census_data, aes(fill = estimate)) +
+  geom_sf() +
+  scale_fill_viridis_c() +
+  scale_color_viridis_c(guide = FALSE) +
+  coord_sf(crs = 26916, datum = NA) +
+  labs(title = "Estimates by Census Tract",
+       subtitle = "Wilmington, DE",
+       caption = "Data: 2013-2017 5-year ACS
+       \nData acquired with the R tidycensus package.",
+       fill = "ACS estimate") +
+  facet_wrap(~variable)
+```
+
+## Plotting some comparable Variables
+
+```{r}
+## filter race
+wilm_census_race <- wilm_census_data %>%
+  filter(variable %in% c("hispanic", "black", "asian", "white"))
+```
+```{r race, eval= FALSE}
+ggplot(wilm_census_race, aes(fill = estimate)) +
+  geom_sf() +
+  scale_fill_viridis_c() +
+  coord_sf(crs = 26916, datum = NA) +
+  labs(title = "Population Estimates",
+       subtitle = "Wilmington, DE",
+       fill = "ACS estimate") +
+  facet_wrap(~variable)
+```
+
+## 
+
+```{r race, echo=FALSE}
+```
+
+## Comparing the Right Way
+
+'Small multiples plots' are useful to compare between variables.
+But we need to make sure we compare the right proportions so as to not let people take away a wrong insight.
+
+Let's do some data aggregation and data joins.
+
+Highlight and run to see the separate steps.
+
+```{r}
+# get the total population by summing up the different race estimates
+wilm_tract_pop <- wilm_census_race %>%
+  group_by(Census_Tract_Number) %>%
+  summarise(Population_Estimate = sum(estimate))
+
+st_geometry(wilm_tract_pop) <- NULL # remove geometry
+
+wilm_tract_percpop <- wilm_census_race %>%
+  left_join(wilm_tract_pop, by = "Census_Tract_Number") %>%
+  mutate(Percentage = estimate/Population_Estimate)
+```
+
+Note: tidycensus allows you to get the summary value through the API as well!
+
+## Plot Percentage Population
+
+```{r percpop, eval=FALSE}
+ggplot(wilm_tract_percpop, aes(fill = Percentage)) +
+  geom_sf() +
+  scale_fill_viridis_c() +
+  coord_sf(crs = 26916, datum = NA) +
+  labs(title = "Percentage of Population (Estimates) by Census Tract",
+       subtitle = "Wilmington, DE",
+       fill = "ACS estimate") +
+  facet_wrap(~variable)
+```
+
+##
+
+```{r percpop, echo=FALSE}
+```
+
+## Your Turn
+
+You can create a Wilmington Education variable by filtering `c("high_school_diplomas", "bachelor_degrees", "masters_degrees")` variables and recreating the previous visualizations for these variables.
+
+## Answer
+
+```{r, eval=FALSE}
+wilm_census_edu <- wilm_census_data %>%
+  filter(variable %in% c("high_school_diplomas", "bachelor_degrees", "masters_degrees"))
+
+ggplot(wilm_census_edu, aes(fill = estimate)) +
+  geom_sf() +
+  scale_fill_viridis_c() +
+  coord_sf(crs = 26916, datum = NA) +
+  labs(title = "Education Estimates",
+       subtitle = "Wilmington, DE",
+       fill = "ACS estimate") +
+  facet_wrap(~variable)
+```
+
+##
+
+```{r, eval=FALSE}
+# As a percentage of education data available (this isn't perfect)
+# get the total population by summing up the different race estimates
+wilm_tract_totedu <- wilm_census_edu %>%
+  group_by(Census_Tract_Number) %>%
+  summarise(Education_Estimate = sum(estimate))
+
+st_geometry(wilm_tract_totedu) <- NULL # remove geometry
+
+wilm_tract_percedu <- wilm_tract_totedu %>%
+  left_join(wilm_census_edu, by = "Census_Tract_Number") %>%
+  mutate(Percentage = estimate/Education_Estimate)
+
+# Plot
+ggplot(wilm_tract_percedu, aes(fill = Percentage)) +
+  geom_sf() +
+  scale_fill_viridis_c() +
+  coord_sf(crs = 26916, datum = NA) +
+  labs(title = "Percentage of Education Estimates by Census Tract",
+       subtitle = "Wilmington, DE",
+       fill = "ACS estimate") +
+  facet_wrap(~variable)
+```
+
+## Dot Density Plots
+
+Choropleth maps have a tendency of being misunderstood due to the *area* covered by a color. 
+We can plot dots in order to avoid the issue of misrepresentation of sparsely populated areas and give an idea of density. 
+
+Hold tight as this will have some heavy lifting with functions from dplyr and purrr!
+
+```{r}
+wm_dots <- map(c("white", "black", "asian", "hispanic"), function(group) {
+    wilm_census_data %>%
+        filter(variable == group) %>%
+        st_sample(., size = .$estimate / 10, exact = FALSE) %>%
+        st_sf() %>%
+        mutate(group = group) 
+}) %>%
+    reduce(rbind) %>%
+    group_by(group) %>%
+    summarize()
+```
+
+##
+
+`map` Applys a function to each element of a vector, in our case the vector is the race values.
+i.e, for each race we subset the wilmington data, and create dots representing the population in each tract.
+
+```{r, eval=FALSE}
+wilm_census_data %>%
+        filter(variable == group) %>%
+        st_sample(., size = .$estimate / 10, exact = FALSE) %>%
+        st_sf() %>%
+        mutate(group = group)
+```
+
+st_sample() generates a sample of random dots each one representing 10 people. 
+st_sf() converts the POINT geometry set back to simple features dataframe.
+
+## Plotting it all together
+
+```{r}
+ggplot() + 
+    geom_sf(data = wilm_census_data, color = "grey95", fill = "white") + 
+    geom_sf(data = wm_dots, aes(color = group, fill = group), 
+            size = 0.1, alpha = 0.5) +
+    theme_minimal()
+```
+
+## Looking back
+
+Data being tidy allowed us to immediately use commands like:
 
 * facet
 * group_by
 
-## Recreating Maps/Other Analysis
-
+Remember ACS are estimates so we should consider the MOE or Margin of Error variable. 
 
 ## Next steps
+
+- Try using another layer with alpha to show the MOE [*](https://www.cdc.gov/dhdsp/maps/gisx/training/module4/files/4_mapping_uncertainty_module-508.pdf)
+- Integrate this data with statistics from the Uniform Crime Reporting database
+- Ask interesting questions and use tidy functions to get quick results
+
+## Extra Questions
+
+- What are the high median rent areas?
+- Does the median house value correlate with houses earning above 200k
+- Among high median house value ones what is the percentage of owner/renter
+- More Education levels more Median income
+- Bachelors earning more (baby boomer identification)
+- Where are the Vacant houses and the median income in these areas
