@@ -90,7 +90,7 @@ v1 <- c(1, 2, 3, 4)
 v2 <- c(5, 6, 7, 8)
 v2-v1
 ```
-instead of writing a for loop to subtract the individual elements
+instead of writing a *for loop* to subtract the individual elements
 
 The packages inside the tidyverse, e.g `dplyr`, let you do data cleaning and manipulation operations easily when data is in tidy format.
 
@@ -124,7 +124,10 @@ knitr::include_graphics("images/repo-download.png")
 ```{r, eval=FALSE}
 install.packages("sf")
 install.packages("tidycensus")
-
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("tidyr")
+install.packages("purrr")
 ```
 
 ## Load Libraries
