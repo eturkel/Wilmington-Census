@@ -1,0 +1,9 @@
+.largeoutput .remark-code { /*Change made here*/
+  font-size: 130% !important;
+}
+.smalloutput .remark-code { /*Change made here*/
+  font-size: 70% !important;
+}
+.tinyoutput .remark-code { /*Change made here*/
+  font-size: 50% !important;
+}
